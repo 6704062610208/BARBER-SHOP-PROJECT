@@ -24,7 +24,7 @@ class UserResponseRegister(BaseModel):
     profile_img: str|None = None
     create_at: datetime
     update_at: datetime
-    is_active: bool
+    is_active: bool = True
 
     class Config:
         from_attributes = True
@@ -34,7 +34,8 @@ class UserCreateLogin(BaseModel):
     password:str
 
 class UserResponseLogin(BaseModel):
-    pass
+    username:str
+    is_active: bool = True
+    
     class Config:
         from_attributes = True
-
