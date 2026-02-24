@@ -36,7 +36,7 @@ class DayOfWeek(enum.Enum):
     SUNDAY = "SUNDAY" 
     MONDAY = "MONDAY"
     TUESDAY = "TUESDAY"
-    WENESDAY = "WENESDAY"
+    WEDNESDAY = "WEDNESDAY"
     THURSDAY = "THURSDAY"
     FRIDAY = "FRIDAY"
     SATURDAY = "SATURDAY"
@@ -84,8 +84,7 @@ class Barber(Base):
     user_id:Mapped[int] = mapped_column(ForeignKey("users.id"))
     user_data:Mapped["User"] = relationship(single_parent=True)
     time_working:Mapped[list["QueueSlots"]] = relationship("QueueSlots", secondary=working_slot_table, back_populates="barber_working")
-    leave_letter:Mapped[list["LeaveLetter"]] = relationship()
-    leave_letter = relationship("LeaveLetter", back_populates="barber")
+    leave_letter:Mapped[list["LeaveLetter"]] = relationship("LeaveLetter", back_populates="barber")
 
 
 
@@ -123,7 +122,7 @@ class LeaveLetter(Base):
     id:Mapped[int] = mapped_column(primary_key=True)
     barber_id:Mapped[int] = mapped_column(ForeignKey("barbers.id"))
     report:Mapped[str] = mapped_column(String(255),nullable=False)
-    date_leave:Mapped[date] = mapped_column(Date,nullable=False)
+    date_leave:Mapped[date] = mapped_column(DateTime(timezone=True),server_default=func.now())
     status:Mapped[LeaveStatus] = mapped_column(Enum(LeaveStatus),default=LeaveStatus.PENDING)
     create_at:Mapped[datetime] = mapped_column(DateTime,nullable=False)
     barber = relationship("Barber", back_populates="leave_letter")
