@@ -7,15 +7,20 @@ from sqlalchemy.orm import relationship,Mapped,mapped_column
 class BookedStatus(enum.Enum):
     AVAILABLE = "AVAILABLE"
     BOOKED = "BOOKED"
-    SERVING = "SERVING"
+    CHECKIN = "CHECKIN"
     CANCELLED = "CANCELLED"
-    COMPLETED = "COMPLETED"
+    COMPLETE = "COMPLETE"
     NO_SHOW = "NO_SHOW"
 
 class ChairStatus(enum.Enum):
     AVAILABLE = "AVAILABLE"
-    FULL = "FULLY"
+    FULLY = "FULLY"
     CLOSED = "CLOSED"
+
+class TypeUser(enum.Enum):
+    WALK_IN = "WALK_IN"
+    ONLINE = "ONLINE"
+    NONE = "NONE"
 
 class UserRole(enum.Enum):
     MEMBER = "MEMBER"
@@ -26,6 +31,16 @@ class LeaveStatus(enum.Enum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
+
+class DayOfWeek(enum.Enum):
+    SUNDAY = "SUNDAY" 
+    MONDAY = "MONDAY"
+    TUESDAY = "TUESDAY"
+    WENESDAY = "WENESDAY"
+    THURSDAY = "THURSDAY"
+    FRIDAY = "FRIDAY"
+    SATURDAY = "SATURDAY"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -57,7 +72,7 @@ working_slot_table = Table(
 chair_for_date = Table(
     "chair_for_date",
     Base.metadata,
-    Column("open_date",ForeignKey("opening_dates.date_work")),
+    Column("open_date",ForeignKey("opening_dates.day_of_week")),
     Column("chair_id",ForeignKey("chairs.id"))
     
 )
@@ -94,6 +109,7 @@ class QueueSlots(Base):
     customer_id:Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
     #AVAILABLE, BOOKED, SERVING, CANCELLED, COMPLETED
     status:Mapped[BookedStatus] = mapped_column(Enum(BookedStatus),default=BookedStatus.AVAILABLE)
+    status_user:Mapped[TypeUser] = mapped_column(Enum(TypeUser),default=TypeUser.NONE)
     barber_working:Mapped[list["Barber"]] = relationship("Barber", secondary=working_slot_table, back_populates="time_working")
     chair:Mapped["Chair"] = relationship(back_populates="queues")
     customer:Mapped["User"] = relationship(back_populates="queues")
@@ -115,7 +131,7 @@ class LeaveLetter(Base):
 class OpeningDate(Base):
     __tablename__ = "opening_dates"
 
-    date_work: Mapped[date] = mapped_column(Date, unique=True, primary_key=True, nullable=False)
+    day_of_week: Mapped[DayOfWeek] = mapped_column(Enum(DayOfWeek), unique=True, primary_key=True, nullable=False)
     open_time:Mapped[time] = mapped_column(Time,nullable=False)
     close_time:Mapped[time] = mapped_column(Time,nullable=False)
     is_open: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
